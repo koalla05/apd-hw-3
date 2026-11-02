@@ -3,6 +3,28 @@ import XCTest
 final class StudentNavigationUITests: XCTestCase {
     private let firstStudentCellID = "studentCell.00000000-0000-0000-0000-000000000001"
 
+    func testLaunchShowsStudentsTitleAndAllTenSeedRows() {
+        let app = XCUIApplication()
+        app.launch()
+
+        XCTAssertTrue(app.navigationBars["Students"].waitForExistence(timeout: 10))
+        let list = app.tables["studentList"]
+        XCTAssertTrue(list.waitForExistence(timeout: 5))
+
+        // Rows are created lazily, so scroll until each expected cell appears.
+        let expectedIDs = (1...10).map { String(format: "studentCell.00000000-0000-0000-0000-%012d", $0) }
+        XCTAssertEqual(expectedIDs.count, 10)
+        for id in expectedIDs {
+            let cell = list.descendants(matching: .any)[id]
+            var swipes = 0
+            while !cell.exists && swipes < 6 {
+                list.swipeUp()
+                swipes += 1
+            }
+            XCTAssertTrue(cell.exists, "Missing row \(id)")
+        }
+    }
+
     func testTappingRowShowsDetailsAndBackReturnsToList() {
         let app = XCUIApplication()
         app.launch()
