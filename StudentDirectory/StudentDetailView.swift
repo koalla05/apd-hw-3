@@ -2,6 +2,8 @@ import UIKit
 import SnapKit
 
 final class StudentDetailView: UIView {
+    var onSubjectTap: ((String) -> Void)?
+
     private let scrollView = UIScrollView()
     private let avatarImageView = UIImageView()
     private let idLabel = UILabel()
@@ -117,6 +119,9 @@ final class StudentDetailView: UIView {
         }
         let button = UIButton(configuration: configuration)
         button.titleLabel?.numberOfLines = 0
+        button.addAction(UIAction { [weak self] _ in
+            self?.onSubjectTap?(subject)
+        }, for: .touchUpInside)
         button.accessibilityIdentifier = "subjectButton.\(subject)"
         button.accessibilityLabel = subject
         return button

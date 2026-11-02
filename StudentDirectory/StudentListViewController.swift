@@ -3,12 +3,15 @@ import SnapKit
 
 final class StudentListViewController: UIViewController {
     private let store: StudentStore
+    private let subject: String?
     private let tableView = UITableView(frame: .zero, style: .plain)
 
-    init(store: StudentStore) {
+    /// Pass a `subject` to show only students whose `subjects` contain it (exact match).
+    init(store: StudentStore, subject: String? = nil) {
         self.store = store
+        self.subject = subject
         super.init(nibName: nil, bundle: nil)
-        title = "Students"
+        title = subject ?? "Students"
     }
 
     @available(*, unavailable)
@@ -33,6 +36,14 @@ final class StudentListViewController: UIViewController {
         }
     }
 
+    // Read from the store on demand; the controller keeps no copy of the array.
+    private var visibleStudents: [Student] {
+        if let subject {
+            return store.students(matchingSubject: subject)
+        }
+        return store.students
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
@@ -41,11 +52,11 @@ final class StudentListViewController: UIViewController {
 
 extension StudentListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        store.students.count
+        visibleStudents.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let student = store.students[indexPath.row]
+        let student = visibleStudents[indexPath.row]
         guard let cell = tableView.dequeueReusableCell(
             withIdentifier: StudentCell.reuseIdentifier,
             for: indexPath
@@ -61,7 +72,7 @@ extension StudentListViewController: UITableViewDataSource {
 extension StudentListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let student = store.students[indexPath.row]
+        let student = visibleStudents[indexPath.row]
         let detail = StudentDetailViewController(store: store, studentID: student.id)
         navigationController?.pushViewController(detail, animated: true)
     }

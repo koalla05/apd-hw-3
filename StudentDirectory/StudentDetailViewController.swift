@@ -20,6 +20,15 @@ final class StudentDetailViewController: UIViewController {
         view = detailView
     }
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        detailView.onSubjectTap = { [weak self] subject in
+            guard let self else { return }
+            let list = StudentListViewController(store: self.store, subject: subject)
+            self.navigationController?.pushViewController(list, animated: true)
+        }
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         refresh()
