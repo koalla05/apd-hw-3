@@ -22,6 +22,10 @@ final class StudentDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        let editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editTapped))
+        editButton.accessibilityIdentifier = "editStudentButton"
+        navigationItem.rightBarButtonItem = editButton
+
         detailView.onSubjectTap = { [weak self] subject in
             guard let self else { return }
             let list = StudentListViewController(store: self.store, subject: subject)
@@ -32,6 +36,13 @@ final class StudentDetailViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         refresh()
+    }
+
+    @objc private func editTapped() {
+        let form = StudentFormViewController(store: store, mode: .edit(studentID: studentID)) { [weak self] in
+            self?.refresh()
+        }
+        present(UINavigationController(rootViewController: form), animated: true)
     }
 
     private func refresh() {

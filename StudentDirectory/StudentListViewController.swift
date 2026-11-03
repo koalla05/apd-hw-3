@@ -34,6 +34,22 @@ final class StudentListViewController: UIViewController {
         tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+
+        // New students have no subjects, so adding from a filtered list would
+        // not show the new row; only the main list offers it.
+        if subject == nil {
+            let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTapped))
+            addButton.accessibilityIdentifier = "addStudentButton"
+            addButton.accessibilityLabel = "Add student"
+            navigationItem.rightBarButtonItem = addButton
+        }
+    }
+
+    @objc private func addTapped() {
+        let form = StudentFormViewController(store: store, mode: .add) { [weak self] in
+            self?.tableView.reloadData()
+        }
+        present(UINavigationController(rootViewController: form), animated: true)
     }
 
     // Read from the store on demand; the controller keeps no copy of the array.
@@ -75,5 +91,24 @@ extension StudentListViewController: UITableViewDelegate {
         let student = visibleStudents[indexPath.row]
         let detail = StudentDetailViewController(store: store, studentID: student.id)
         navigationController?.pushViewController(detail, animated: true)
+    }
+
+    func tableView(
+        _ tableView: UITableView,
+        commit editingStyle: UITableViewCell.EditingStyle,
+        forRowAt indexPath: IndexPath
+    ) {
+        guard editingStyle == .delete else { return }
+        let student = visibleStudents[indexPath.row]
+        do {
+            try store.deleteStudent(id: student.id)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        } catch let error as StudentStoreError {
+            presentErrorAlert(message: error.userMessage)
+            tableView.reloadData()
+        } catch {
+            presentErrorAlert(message: "Something went wrong.")
+            tableView.reloadData()
+        }
     }
 }
