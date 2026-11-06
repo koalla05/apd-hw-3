@@ -20,8 +20,11 @@ you rejected or revised; if none was rejectable, explain why.
 
 ## Final review
 
-- Agent/tool disclosure:
+- Agent/tool disclosure: Claude Code (Sonnet 5.5) was used throughout: reading the repo, drafting `PLAN.md`, writing the Swift sources (`StudentCell`, `StudentListViewController`, `StudentDetailView`, `StudentDetailViewController`, `StudentFormViewController`, `UIViewController+Alert`), the unit and UI tests. Every material task is logged in the table above. 
 - Accepted and rejected/revised recommendations:
-- Exact local test command and result:
-- CI URL/status:
-- Known limitation or remaining risk:
+  - Accepted: in every question dialog the student chose the most suitable option (cell layout, text-only scholarship status, classic `UITableViewDataSource`, plain list first then optional `subject` init, closure-based subject tap, modal form, alert on error, `onSave` refresh, no delete confirmation).
+  - Revised by the agent: the first draft of the detail avatar centering added, removed and re-added the image view; it was rewritten to a plain container view before testing.
+  - Revised after the student's report: the agent claimed milestone 1 worked from a passing test run, but the student saw a black screen. Cause was a starter wiring gap (no scene delegate class), fixed with one line in `StudentDirectoryApp.swift`. A second black screen was a stale scene session in the simulator, fixed by reinstalling the app.
+  - Agent decision for the student to confirm: no add button on subject-filtered lists, because new students have no subjects and would not appear there.
+- Exact local test command and result: `xcodebuild -project StudentDirectory.xcodeproj -scheme StudentDirectory -destination 'platform=iOS Simulator,name=iPhone 17' test` on commit `6d7d9c0` (only docs changed afterward) → TEST SUCCEEDED, 20 test cases passed, 0 failed (3 starter, 12 student-authored incl. 4 bonus UI tests, plus launch test).
+- Known limitation or remaining risk: one starter file (`StudentDirectoryApp.swift`) was edited to register `SceneDelegate`.

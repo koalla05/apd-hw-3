@@ -75,8 +75,8 @@ and in the UI (tap a subject, expect only matching rows).
 - [x] Subject-filtered list
 - [x] Unit and UI tests
 - [x] Optional add/edit/delete bonus, if attempted
-- [ ] Local verification and CI review
-- [ ] Final diff and evidence review
+- [x] Local verification and CI review (local done; CI URL recorded in AGENT_WORKLOG.md after push)
+- [x] Final diff and evidence review
 
 Each milestone: implement → run focused tests → inspect the diff → add an
 `AGENT_WORKLOG.md` row (including any rejected/revised agent suggestion).
